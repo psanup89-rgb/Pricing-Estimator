@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pricing Estimation Calculator — v2</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#0f172a;
+      --muted:#111827;
+      --text:#e5e7eb;
+      --sub:#9ca3af;
+      --accent:#22d3ee;
+      --accent-2:#38bdf8;
+      --ring: rgba(56,189,248,0.4);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(1200px 800px at 10% -10%, rgba(34,211,238,0.10), transparent 55%),radial-gradient(1000px 600px at 110% 0%, rgba(56,189,248,0.08), transparent 55%),var(--bg);color:var(--text);font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica Neue,Arial}
+    .container{max-width:1440px;margin:0 auto; padding:32px 24px 56px}
+    .title{font-size: clamp(26px, 3vw, 36px); font-weight: 800; letter-spacing:-.02em; background: linear-gradient(90deg,var(--accent),var(--accent-2)); -webkit-background-clip:text; background-clip:text; color: transparent; margin:0 0 6px}
+    .subtitle{color:var(--sub); margin:0 0 18px}
+    .grid{display:grid; gap:20px}
+    @media(min-width: 980px){ .grid{grid-template-columns: 1.15fr 1fr} }
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:16px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); backdrop-filter: blur(6px)}
+    h3{margin:0 0 10px 0; font-size:18px}
+    .two{display:grid; gap:16px}
+    @media(min-width: 720px){
+      .two{grid-template-columns: repeat(2, minmax(320px, 1fr))}
+    }
+    .field{display:flex; flex-direction:column; gap:6px; margin:0}
+    .field label{color: var(--sub); font-size: 14px; line-height:1.35}
+    .field input, .field select{
+      width:100%; border:1px solid rgba(255,255,255,0.14); background: var(--card); color: var(--text);
+      border-radius: 12px; padding: 10px 12px; font-size: 14px; outline:none; transition: box-shadow .15s ease
+    }
+    .field input:focus, .field select:focus{ box-shadow: 0 0 0 4px var(--ring) }
+    .field input[disabled], .field select[disabled]{ opacity:0.75 }
+    .note{font-size:12px; color:var(--sub); margin-top:6px}
+    .btns{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px}
+    .btn{border:1px solid rgba(255,255,255,0.18); background: linear-gradient(90deg, var(--accent), var(--accent-2)); color:var(--card); font-weight:700; padding:10px 14px; border-radius:12px; cursor:pointer; text-shadow:0 1px 0 rgba(255,255,255,0.4)}
+    .btn.secondary{ background: var(--card); color: var(--text); border-color: rgba(255,255,255,0.18); text-shadow:none }
+    table{width:100%; border-collapse: collapse; margin-top:8px}
+    th, td{padding:10px 8px; border-bottom:1px dashed rgba(255,255,255,0.12); text-align:right; font-variant-numeric: tabular-nums}
+    th:first-child, td:first-child{text-align:left}
+    thead th{ position:sticky; top:-1px; background: rgba(0,0,0,0.25); backdrop-filter: blur(6px) }
+    tfoot td{ font-weight:800 }
+    .muted{ color:var(--sub); font-size: 12px }
+    .kpi{display:grid; grid-template-columns: repeat(3,1fr); gap:10px; margin-top: 12px}
+    .k{ background: var(--card); padding: 12px; border-radius: 12px; border:1px solid rgba(255,255,255,0.12) }
+    .k .h{ font-size:12px; color: var(--sub); margin-bottom:4px}
+    .k .v{ font-weight:800; font-size: 18px}
+    .warn{ color:#fbbf24; font-size:12px }
+    .ok{ color:#34d399; font-size:12px }
+    .right{ text-align:right }
+    .stack{ display:grid; gap:10px }
+    .small{ font-size:12px; color:var(--sub) }
+    .pill{ display:inline-flex; gap:6px; align-items:center; border-radius:999px; padding:4px 8px; border:1px solid rgba(255,255,255,0.12) }
+    .pct-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:18px }
+    .pct-col{ display:grid; gap:10px }
+    .guideline{ display:block; font-size:11px; color:var(--sub); font-weight:500 }
+    .summary-card{ margin-top:20px; padding:16px; border-radius:14px; background: linear-gradient(180deg, rgba(34,211,238,0.16), rgba(8, 47, 73, 0.25)); border:1px solid rgba(34,211,238,0.35); display:grid; gap:12px }
+    .summary-title{ font-size:13px; letter-spacing:0.08em; text-transform:uppercase; color:var(--sub) }
+    .summary-values{ display:flex; flex-wrap:wrap; gap:18px }
+    .summary-item{ min-width:140px }
+    .summary-item .label{ font-size:12px; color:var(--sub) }
+    .summary-item .value{ font-size:22px; font-weight:800 }
+    .summary-item .value strong{ color:var(--accent-2) }
+    .table-scroll{ margin-top:8px; border-radius:12px; overflow-x:auto }
+    .table-scroll table{ margin-top:0 }
+    @media(max-width: 720px){
+      .summary-item{ min-width:120px }
+    }
+    @media(max-width: 640px){
+      .container{ padding:24px 16px 40px }
+      .grid{ gap:16px }
+      .card{ padding:14px }
+      .summary-values{ gap:12px }
+      .kpi{ grid-template-columns:1fr; gap:12px }
+    }
+    @media(max-width: 560px){
+      .btns{ flex-direction:column }
+      .btns .btn{ width:100% }
+    }
+    @media(max-width: 480px){
+      .title{ font-size: clamp(24px, 7vw, 30px) }
+      .subtitle{ font-size:14px }
+      .summary-item .value{ font-size:20px }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">Pricing Estimation Calculator</div>
+    <div class="subtitle">Now with currency selection, editable phase percentages, and resource‑mix pricing.</div>
+
+    <div class="grid">
+      <div class="card stack">
+        <h3>Inputs</h3>
+
+        <div class="card" style="border-radius:12px; background: rgba(255,255,255,0.03)">
+          <h3>Resources & Role Rates</h3>
+          <div class="two">
+            <div class="field"><label for="sa">Solution Architect (count)</label><input id="sa" type="number" min="0" step="1" value="1"></div>
+            <div class="field"><label for="rateSA">Rate / hour (SA)</label><input id="rateSA" type="number" min="0" step="0.01" value="100"></div>
+
+            <div class="field"><label for="dm">Delivery Manager (count)</label><input id="dm" type="number" min="0" step="1" value="1"></div>
+            <div class="field"><label for="rateDM">Rate / hour (DM)</label><input id="rateDM" type="number" min="0" step="0.01" value="125"></div>
+
+            <div class="field"><label for="ba">Business Analyst (count)</label><input id="ba" type="number" min="0" step="1" value="1"></div>
+            <div class="field"><label for="rateBA">Rate / hour (BA)</label><input id="rateBA" type="number" min="0" step="0.01" value="80"></div>
+
+            <div class="field"><label for="dev">Developer (count)</label><input id="dev" type="number" min="0" step="1" value="1"></div>
+            <div class="field"><label for="rateDev">Rate / hour (Dev)</label><input id="rateDev" type="number" min="0" step="0.01" value="75"></div>
+
+            <div class="field"><label for="la">Lead Architect (count)</label><input id="la" type="number" min="0" step="1" value="0"></div>
+            <div class="field"><label for="rateLA">Rate / hour (LA)</label><input id="rateLA" type="number" min="0" step="0.01" value="120"></div>
+          </div>
+          <div class="note">Adjust resource counts and hourly rates to reflect the team mix. These values drive the blended base hourly cost.</div>
+        </div>
+
+        <div class="card" style="border-radius:12px; background: rgba(255,255,255,0.03)">
+          <h3>Currency & Hourly Baseline</h3>
+          <div class="two">
+            <div class="field">
+              <label for="currency">Currency</label>
+              <select id="currency">
+                <option value="USD" selected>USD</option>
+                <option value="INR">INR</option>
+                <option value="SAR">SAR</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="perHour">Base per‑hour rate (blended)</label>
+              <input id="perHour" type="number" min="0" step="0.01" value="150" />
+            </div>
+          </div>
+
+          <div class="two">
+            <div class="field">
+              <label for="inrPerUsd">INR per 1 USD</label>
+              <input id="inrPerUsd" type="number" min="0" step="0.0001" value="83.00"/>
+            </div>
+            <div class="field">
+              <label for="inrPerSar">INR per 1 SAR</label>
+              <input id="inrPerSar" type="number" min="0" step="0.0001" value="22.00"/>
+            </div>
+          </div>
+          <div class="note">Currency swaps revalue the fixed role rates; the blended suggestion updates as a placeholder—feel free to override the base rate.</div>
+
+          <div class="two">
+            <div class="field">
+              <label for="buildHours">Build Hours (Development)</label>
+              <input id="buildHours" type="number" min="0" step="1" value="500" />
+            </div>
+            <div class="field">
+              <label for="hoursPerDay">Business hours / day</label>
+              <input id="hoursPerDay" type="number" min="1" step="0.5" value="6" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-radius:12px; background: rgba(255,255,255,0.03)">
+          <h3>Component Percentages (% of Build Hours)</h3>
+          <div class="pct-grid">
+            <div class="pct-col">
+              <div class="field"><label for="pctDiscovery">1. Discovery &amp; Pre-Development<span class="guideline">Guideline ≤ 15%</span></label><input id="pctDiscovery" type="number" step="0.01" value="12"></div>
+              <div class="field"><label for="pctSoln">2. Solution Design<span class="guideline">Guideline ≤ 15%</span></label><input id="pctSoln" type="number" step="0.01" value="12"></div>
+              <div class="field"><label>3. Development<span class="guideline">Custom (Build Hours)</span></label><input disabled value="Custom (Build Hours)"></div>
+              <div class="field"><label for="pctQA">4. Internal QA / Alpha Testing<span class="guideline">Guideline ≤ 15%</span></label><input id="pctQA" type="number" step="0.01" value="10"></div>
+              <div class="field"><label for="pctUAT">5. UAT Support<span class="guideline">Guideline ≤ 15%</span></label><input id="pctUAT" type="number" step="0.01" value="10"></div>
+            </div>
+            <div class="pct-col">
+              <div class="field"><label for="pctGoLive">6. Go‑Live Support &amp; Deployment<span class="guideline">Guideline ≤ 10%</span></label><input id="pctGoLive" type="number" step="0.01" value="6"></div>
+              <div class="field"><label for="pctDocs">7. Documentation<span class="guideline">Guideline ≤ 5%</span></label><input id="pctDocs" type="number" step="0.01" value="3"></div>
+              <div class="field"><label for="pctTrain">8. Training<span class="guideline">Guideline ≤ 5%</span></label><input id="pctTrain" type="number" step="0.01" value="3"></div>
+              <div class="field"><label for="pctRisk">9. Buffer / Contingency<span class="guideline">Guideline ≤ 10%</span></label><input id="pctRisk" type="number" step="0.01" value="8"></div>
+              <div class="field"><label for="pctPM">10. Management &amp; Governance<span class="guideline">Guideline ≤ 5%</span></label><input id="pctPM" type="number" step="0.01" value="5"></div>
+            </div>
+          </div>
+          <div id="pctSum" class="note"></div>
+        </div>
+
+        <div class="btns">
+          <button class="btn" id="generateBtn" type="button">Generate Estimate (PDF)</button>
+          <button class="btn secondary" id="resetBtn" type="button">Reset</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Estimated Hours & Cost</h3>
+        <div class="table-scroll">
+          <table id="resultTable">
+            <thead>
+              <tr><th>Component</th><th>% of Build</th><th>Hours</th><th>Cost</th><th>Duration (days)</th><th>Duration (weeks)</th></tr>
+            </thead>
+            <tbody></tbody>
+            <tfoot>
+              <tr><td>Total</td><td class="right">—</td><td id="tHours" class="right">0</td><td id="tCost" class="right">0</td><td id="tDays" class="right">0</td><td id="tWeeks" class="right">0</td></tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-title">Project Snapshot</div>
+          <div class="summary-values">
+            <div class="summary-item">
+              <div class="label">Total Cost</div>
+              <div class="value"><strong id="summaryCost">—</strong></div>
+            </div>
+            <div class="summary-item">
+              <div class="label">Duration (Days)</div>
+              <div class="value"><strong id="summaryDays">—</strong></div>
+            </div>
+            <div class="summary-item">
+              <div class="label">Duration (Weeks)</div>
+              <div class="value"><strong id="summaryWeeks">—</strong></div>
+            </div>
+            <div class="summary-item">
+              <div class="label">Total Hours</div>
+              <div class="value"><strong id="summaryHours">—</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi">
+          <div class="k"><div class="h">Team Size</div><div class="v" id="teamSize">0</div></div>
+          <div class="k"><div class="h">Daily Burn (selected currency)</div><div class="v" id="burnDay">—</div></div>
+          <div class="k"><div class="h">Avg. Duration (days)</div><div class="v" id="avgDur">—</div></div>
+        </div>
+
+        <div class="small" style="margin-top:10px">
+          <span class="pill">Cost model: <b>Daily burn from role mix × duration</b> (duration = total hours ÷ business hours/day).</span>
+        </div>
+        <div id="alerts" class="small" style="margin-top:6px"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Helpers
+    const num = (x) => +x || 0;
+    const clamp2 = (n) => Math.round(n * 100) / 100;
+    const fmt = (n) => new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(n);
+    const money = (n, curr) => new Intl.NumberFormat(undefined, { style: "currency", currency: curr, maximumFractionDigits: 0 }).format(n);
+    let lastCurrency = null;
+    let perHourEdited = false;
+    const DEFAULT_BUSINESS_HOURS_PER_DAY = 6;
+    const BUSINESS_DAYS_PER_WEEK = 5;
+    let pdfLibPromise = null;
+
+    function pdfLibsLoaded(){
+      return !!(window.jspdf && window.jspdf.jsPDF);
+    }
+
+    function ensurePdfLibs(){
+      if(pdfLibsLoaded()){
+        return Promise.resolve();
+      }
+      if(pdfLibPromise){
+        return pdfLibPromise;
+      }
+      const src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+      pdfLibPromise = new Promise((resolve, reject)=>{
+        const cleanup = (err)=>{
+          pdfLibPromise = null;
+          reject(err);
+        };
+        if(document.querySelector(`script[data-pdf-src="${src}"]`)){
+          const checkExisting = ()=>{
+            if(pdfLibsLoaded()){
+              resolve();
+            }else{
+              setTimeout(checkExisting, 50);
+            }
+          };
+          checkExisting();
+          return;
+        }
+        const script = document.createElement("script");
+        script.src = src;
+        script.async = true;
+        script.setAttribute("data-pdf-src", src);
+        script.onload = ()=>{
+          if(pdfLibsLoaded()){
+            resolve();
+          }else{
+            cleanup(new Error("PDF library failed to initialize after loading."));
+          }
+        };
+        script.onerror = ()=>{
+          script.remove();
+          cleanup(new Error("Failed to load PDF dependency."));
+        };
+        document.head.appendChild(script);
+      });
+      return pdfLibPromise;
+    }
+
+    function readInputs(){
+      const els = (id)=>document.getElementById(id);
+      const currency = els("currency").value;
+      const inrPerUsd = num(els("inrPerUsd").value);
+      const inrPerSar = num(els("inrPerSar").value);
+
+      // Role counts & rates (in selected currency units per hour)
+      const roles = [
+        { key:"sa", label:"Solution Architect", count:num(els("sa").value), rate:num(els("rateSA").value) },
+        { key:"dm", label:"Delivery Manager", count:num(els("dm").value), rate:num(els("rateDM").value) },
+        { key:"ba", label:"Business Analyst", count:num(els("ba").value), rate:num(els("rateBA").value) },
+        { key:"dev", label:"Developer", count:num(els("dev").value), rate:num(els("rateDev").value) },
+        { key:"la", label:"Lead Architect", count:num(els("la").value), rate:num(els("rateLA").value) },
+      ];
+
+      // Base rate for legacy/blended context (in selected currency)
+      const perHour = num(els("perHour").value);
+
+      // Percentages
+      const pct = {
+        discovery: num(els("pctDiscovery").value)/100,
+        soln:      num(els("pctSoln").value)/100,
+        qa:        num(els("pctQA").value)/100,
+        uat:       num(els("pctUAT").value)/100,
+        go:        num(els("pctGoLive").value)/100,
+        docs:      num(els("pctDocs").value)/100,
+        train:     num(els("pctTrain").value)/100,
+        risk:      num(els("pctRisk").value)/100,
+        pm:        num(els("pctPM").value)/100,
+      };
+
+      const buildHours = num(els("buildHours").value);
+      const hoursPerDayRaw = num(els("hoursPerDay").value);
+      const hoursPerDay = hoursPerDayRaw > 0 ? hoursPerDayRaw : DEFAULT_BUSINESS_HOURS_PER_DAY;
+
+      return { currency, inrPerUsd, inrPerSar, roles, perHour, pct, buildHours, hoursPerDay };
+    }
+
+    function toINR(value, currency, inrPerUsd, inrPerSar){
+      if(currency === "INR") return value;
+      if(currency === "USD") return value * inrPerUsd;
+      if(currency === "SAR") return value * inrPerSar;
+      return value;
+    }
+    function fromINR(valueINR, currency, inrPerUsd, inrPerSar){
+      if(currency === "INR") return valueINR;
+      if(currency === "USD") return inrPerUsd ? valueINR / inrPerUsd : 0;
+      if(currency === "SAR") return inrPerSar ? valueINR / inrPerSar : 0;
+      return valueINR;
+    }
+
+    function syncRatesForCurrencyChange(prevCurrency, nextCurrency){
+      if(!prevCurrency || prevCurrency === nextCurrency) return;
+      const inrPerUsd = num(document.getElementById("inrPerUsd").value);
+      const inrPerSar = num(document.getElementById("inrPerSar").value);
+      const rateFields = ["perHour","rateSA","rateDM","rateBA","rateDev","rateLA"];
+      rateFields.forEach(id=>{
+        const el = document.getElementById(id);
+        const currentValue = num(el.value);
+        const valueINR = toINR(currentValue, prevCurrency, inrPerUsd, inrPerSar);
+        const converted = fromINR(valueINR, nextCurrency, inrPerUsd, inrPerSar);
+        const normalized = Number.isFinite(converted) ? Math.round(converted * 100) / 100 : 0;
+        el.value = normalized;
+      });
+    }
+    function blendedBaseRate(roles){
+      const total = roles.reduce((sum, role)=> sum + (role.count * role.rate * 0.5), 0);
+      return Math.round(total * 100) / 100;
+    }
+
+    function calculate(){
+      const els = (id)=>document.getElementById(id);
+      const ui = readInputs();
+      const safeHoursPerDay = ui.hoursPerDay > 0 ? ui.hoursPerDay : DEFAULT_BUSINESS_HOURS_PER_DAY;
+      const derivedRate = blendedBaseRate(ui.roles);
+      const perHourEl = document.getElementById("perHour");
+      perHourEl.setAttribute("data-derived", derivedRate.toFixed(2));
+      perHourEl.placeholder = derivedRate.toFixed(2);
+      if(!perHourEdited){
+        perHourEl.value = derivedRate;
+      }else if(perHourEl.value === ""){
+        perHourEl.value = derivedRate;
+      }
+      const effectivePerHour = num(perHourEl.value) || derivedRate;
+      ui.perHour = effectivePerHour;
+
+      // Compute component hours
+      const comps = [
+        { name: "1. Discovery & Pre-Development",   pct: ui.pct.discovery },
+        { name: "2. Solution Design",               pct: ui.pct.soln },
+        { name: "3. Development",                   pct: "custom" },
+        { name: "4. Internal QA / Alpha Testing",   pct: ui.pct.qa },
+        { name: "5. UAT Support",                   pct: ui.pct.uat },
+        { name: "6. Go-Live Support & Deployment",  pct: ui.pct.go },
+        { name: "7. Documentation",                 pct: ui.pct.docs },
+        { name: "8. Training",                      pct: ui.pct.train },
+        { name: "9. Buffer / Contingency",          pct: ui.pct.risk },
+        { name: "10. Management & Governance",      pct: ui.pct.pm },
+      ];
+
+      const tbody = document.querySelector("#resultTable tbody");
+      tbody.innerHTML = "";
+
+      let totalHours = 0;
+      let totalCostINR = 0;
+
+      // Team stats
+      const teamSize = ui.roles.reduce((s,r)=>s + r.count, 0);
+      const dailyBurnSelectedCurrency =
+        ui.roles.reduce((s,r)=> s + (r.count * r.rate * safeHoursPerDay), 0);
+      const dailyBurnINR = toINR(dailyBurnSelectedCurrency, ui.currency, ui.inrPerUsd, ui.inrPerSar);
+
+      // Fill table
+      comps.forEach(c => {
+        const hours = (c.pct === "custom") ? ui.buildHours : clamp2((c.pct * ui.buildHours));
+        const days = hours / safeHoursPerDay;
+        const weeks = days / BUSINESS_DAYS_PER_WEEK;
+
+        totalHours += hours;
+
+        // Cost is computed at the overall level via daily burn; still show a per-row cost proportionally
+        // Proportional allocation of total cost will be filled after total cost is known.
+        const tr = document.createElement("tr");
+        const pctTxt = (c.pct === "custom") ? "—" : (c.pct*100).toFixed(2) + "%";
+        tr.innerHTML = `<td>${c.name}</td><td>${pctTxt}</td><td data-h="1">${fmt(hours)}</td><td data-c="1">—</td><td>${fmt(days)}</td><td>${fmt(weeks)}</td>`;
+        tbody.appendChild(tr);
+      });
+
+      // Duration & cost (project-level)
+      const durationDays = totalHours / safeHoursPerDay;
+      const totalCostINR_fromBurn = dailyBurnINR * durationDays;
+      totalCostINR = totalCostINR_fromBurn;
+
+      // If user is using a blended single rate (perHour) and no role rates entered (counts sum to 0),
+      // fallback to legacy model totalHours × rate
+      if(teamSize === 0){
+        // interpret perHour as selected currency rate
+        const totalCostSelected = totalHours * ui.perHour;
+        totalCostINR = toINR(totalCostSelected, ui.currency, ui.inrPerUsd, ui.inrPerSar);
+      }
+
+      // Allocate costs to rows proportionally by hours
+      const trs = Array.from(tbody.querySelectorAll("tr"));
+      trs.forEach(tr => {
+        const h = parseFloat((tr.children[2].textContent || "0").replace(/,/g,"")) || 0;
+        const share = totalHours > 0 ? h / totalHours : 0;
+        const rowCostINR = totalCostINR * share;
+        const rowCostSelected = fromINR(rowCostINR, ui.currency, ui.inrPerUsd, ui.inrPerSar);
+        tr.children[3].textContent = money(rowCostSelected, ui.currency);
+      });
+
+      // Totals
+      const tHours = document.getElementById("tHours");
+      const tCost  = document.getElementById("tCost");
+      const tDays  = document.getElementById("tDays");
+      const tWeeks = document.getElementById("tWeeks");
+      const totalWeeks = durationDays / BUSINESS_DAYS_PER_WEEK;
+      tHours.textContent = fmt(totalHours);
+      tDays.textContent  = fmt(durationDays);
+      tWeeks.textContent = fmt(totalWeeks);
+      const totalCostSelectedCurrency = fromINR(totalCostINR, ui.currency, ui.inrPerUsd, ui.inrPerSar);
+      tCost.textContent  = money(totalCostSelectedCurrency, ui.currency);
+
+      document.getElementById("summaryCost").textContent  = money(totalCostSelectedCurrency, ui.currency);
+      document.getElementById("summaryDays").textContent  = fmt(durationDays);
+      document.getElementById("summaryWeeks").textContent = fmt(totalWeeks);
+      document.getElementById("summaryHours").textContent = fmt(totalHours);
+
+      // KPIs
+      document.getElementById("teamSize").textContent = teamSize;
+      document.getElementById("burnDay").textContent = teamSize > 0 ? money(dailyBurnSelectedCurrency, ui.currency) : "—";
+      document.getElementById("avgDur").textContent = fmt(durationDays);
+
+      // Percentage sum info
+      const pctSum = (ui.pct.discovery + ui.pct.soln + ui.pct.qa + ui.pct.uat + ui.pct.go + ui.pct.docs + ui.pct.train + ui.pct.risk + ui.pct.pm) * 100;
+      const pctSumEl = document.getElementById("pctSum");
+      const target = 95; // guideline sum excluding Development
+      const delta = clamp2(pctSum - target);
+      pctSumEl.innerHTML = `Current sum (excluding Development): <b>${pctSum.toFixed(2)}%</b> <span class="${pctSum<=target?'ok':'warn'}">(guide: ≤${target}%, Δ ${delta.toFixed(2)}%)</span>`;
+
+      // Alerts
+      const alerts = document.getElementById("alerts");
+      let notes = [];
+      if(teamSize === 0) notes.push("Team size is 0 — using blended rate model (Total Hours × Base per‑hour).");
+      if(pctSum <= 0) notes.push("All percentages are 0; only Development will be counted.");
+      alerts.innerHTML = notes.join(" ");
+    }
+
+
+    async function generateEstimate(){
+      const btn = document.getElementById("generateBtn");
+      const originalText = btn ? btn.textContent : "";
+      if(btn){
+        btn.disabled = true;
+        btn.textContent = "Preparing PDF...";
+      }
+      let libsReady = false;
+      try{
+        await ensurePdfLibs();
+        libsReady = true;
+        calculate();
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: "pt", format: "a4" });
+
+        const ui = readInputs();
+        const generatedStamp = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date());
+        const summaryCost = document.getElementById("summaryCost").textContent || "—";
+        const summaryDays = document.getElementById("summaryDays").textContent || "—";
+        const summaryWeeks = document.getElementById("summaryWeeks").textContent || "—";
+        const summaryHours = document.getElementById("summaryHours").textContent || "—";
+        const perHourDisplay = new Intl.NumberFormat(undefined, { style: "currency", currency: ui.currency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(ui.perHour || 0);
+        const numberCompact = (value) => new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(value);
+
+        const docWidth = doc.internal.pageSize.getWidth();
+        const marginX = 48;
+        let cursorY = 72;
+
+        doc.setFont("helvetica","bold");
+        doc.setFontSize(24);
+        doc.setTextColor(34,40,60);
+        doc.text("Proposal Cost Estimate", marginX, cursorY);
+        cursorY += 18;
+        doc.setFont("helvetica","normal");
+        doc.setFontSize(11);
+        doc.setTextColor(99,102,112);
+        doc.text(`Generated ${generatedStamp}`, marginX, cursorY);
+        cursorY += 28;
+        doc.setTextColor(34,40,60);
+
+        const summaryCards = [
+          { label: "Total Cost", value: summaryCost },
+          { label: "Duration (Days)", value: summaryDays },
+          { label: "Duration (Weeks)", value: summaryWeeks },
+          { label: "Total Hours", value: summaryHours },
+          { label: "Build Hours (Dev)", value: fmt(ui.buildHours) },
+          { label: "Business Hours / Day", value: numberCompact(ui.hoursPerDay) },
+          { label: "Blended Rate / hr", value: perHourDisplay },
+          { label: "Currency", value: ui.currency }
+        ];
+        const cardsPerRow = 3;
+        const cardGap = 16;
+        const usableWidth = docWidth - marginX * 2;
+        const cardWidth = (usableWidth - cardGap * (cardsPerRow - 1)) / cardsPerRow;
+        const cardHeight = 72;
+        summaryCards.forEach((card, idx)=>{
+          const col = idx % cardsPerRow;
+          const row = Math.floor(idx / cardsPerRow);
+          const cardX = marginX + col * (cardWidth + cardGap);
+          const cardY = cursorY + row * (cardHeight + cardGap);
+          doc.setFillColor(248,250,252);
+          doc.roundedRect(cardX, cardY, cardWidth, cardHeight, 10, 10, "F");
+          doc.setFont("helvetica","normal");
+          doc.setFontSize(11);
+          doc.setTextColor(107,114,128);
+          doc.text(card.label, cardX + 14, cardY + 22);
+          doc.setFont("helvetica","bold");
+          doc.setFontSize(16);
+          doc.setTextColor(17,24,39);
+          doc.text(card.value, cardX + 14, cardY + 46, { maxWidth: cardWidth - 28 });
+        });
+        const summaryRows = Math.ceil(summaryCards.length / cardsPerRow);
+        const cardsBlockHeight = summaryRows * cardHeight + Math.max(0, summaryRows - 1) * cardGap;
+        cursorY += cardsBlockHeight + 32;
+
+        doc.setFont("helvetica","bold");
+        doc.setFontSize(13);
+        doc.setTextColor(34,40,60);
+        doc.text("Estimate Summary", marginX, cursorY);
+        cursorY += 18;
+        doc.setFont("helvetica","normal");
+        doc.setFontSize(11);
+        doc.setTextColor(55,65,81);
+        const summaryLines = [
+          `Projected effort totals ${summaryHours}, covering core delivery phases over approximately ${summaryWeeks} weeks (${summaryDays} days).`,
+          `Calculations apply a blended baseline of ${perHourDisplay} with currency set to ${ui.currency}.`
+        ];
+        summaryLines.forEach(line=>{
+          const wrapped = doc.splitTextToSize(line, docWidth - marginX * 2);
+          doc.text(wrapped, marginX, cursorY, { lineHeightFactor: 1.4 });
+          const lineAdvance = wrapped.length * 15.4;
+          cursorY += lineAdvance + 6;
+        });
+        const conversionLine = `Conversion references · 1 USD = ${numberCompact(ui.inrPerUsd)} INR · 1 SAR = ${numberCompact(ui.inrPerSar)} INR`;
+        const conversionWrapped = doc.splitTextToSize(conversionLine, docWidth - marginX * 2);
+        doc.setTextColor(75,85,99);
+        doc.text(conversionWrapped, marginX, cursorY, { lineHeightFactor: 1.4 });
+        cursorY += conversionWrapped.length * 15.4 + 10;
+
+        doc.setFont("helvetica","normal");
+        doc.setFontSize(9);
+        doc.setTextColor(148,163,184);
+        doc.text("Generated by Pricing Estimation Calculator v2", marginX, cursorY);
+
+        doc.save("zoho-cost-estimate.pdf");
+      }catch(err){
+        console.error(err);
+        if(libsReady){
+          alert("An unexpected error occurred while generating the PDF. Please check the console for details and try again.");
+        }else{
+          alert("Unable to load the PDF generator. Please check your connection and try again.");
+        }
+      }finally{
+        if(btn){
+          btn.disabled = false;
+          btn.textContent = originalText || "Generate Estimate (PDF)";
+        }
+      }
+    }
+
+    function wire(){
+      const ids = ["perHour","inrPerUsd","inrPerSar","buildHours","hoursPerDay",
+                   "pctDiscovery","pctSoln","pctQA","pctUAT","pctGoLive","pctDocs","pctTrain","pctRisk","pctPM",
+                   "sa","dm","ba","dev","la","rateSA","rateDM","rateBA","rateDev","rateLA"];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if(id === "perHour"){
+          el.addEventListener("input", ()=>{
+            perHourEdited = true;
+            calculate();
+          });
+        }else{
+          el.addEventListener("input", calculate);
+        }
+      });
+      const currencyEl = document.getElementById("currency");
+      lastCurrency = currencyEl.value;
+      currencyEl.addEventListener("change", ()=>{
+        const nextCurrency = currencyEl.value;
+        syncRatesForCurrencyChange(lastCurrency, nextCurrency);
+        lastCurrency = nextCurrency;
+        calculate();
+      });
+      document.getElementById("resetBtn").addEventListener("click", ()=>{
+        document.getElementById("currency").value = "USD";
+        lastCurrency = "USD";
+        perHourEdited = false;
+        document.getElementById("perHour").value = 150;
+        document.getElementById("inrPerUsd").value = 83.00;
+        document.getElementById("inrPerSar").value = 22.00;
+        document.getElementById("buildHours").value = 500;
+        document.getElementById("hoursPerDay").value = 6;
+        document.getElementById("pctDiscovery").value = 12;
+        document.getElementById("pctSoln").value = 12;
+        document.getElementById("pctQA").value = 10;
+        document.getElementById("pctUAT").value = 10;
+        document.getElementById("pctGoLive").value = 6;
+        document.getElementById("pctDocs").value = 3;
+        document.getElementById("pctTrain").value = 3;
+        document.getElementById("pctRisk").value = 8;
+        document.getElementById("pctPM").value = 5;
+        document.getElementById("sa").value = 1;
+        document.getElementById("dm").value = 1;
+        document.getElementById("ba").value = 1;
+        document.getElementById("dev").value = 1;
+        document.getElementById("la").value = 0;
+        document.getElementById("rateSA").value = 100;
+        document.getElementById("rateDM").value = 125;
+        document.getElementById("rateBA").value = 80;
+        document.getElementById("rateDev").value = 75;
+        document.getElementById("rateLA").value = 120;
+        calculate();
+      });
+      const generateBtn = document.getElementById("generateBtn");
+      if(generateBtn){
+        generateBtn.addEventListener("click", generateEstimate);
+      }
+      calculate();
+    }
+    wire();
+  </script>
+</body>
+</html>
