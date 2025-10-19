@@ -108,10 +108,10 @@
             <div class="field"><label for="rateDM">Rate / hour (DM)</label><input id="rateDM" type="number" min="0" step="0.01" value="125"></div>
 
             <div class="field"><label for="ba">Business Analyst (count)</label><input id="ba" type="number" min="0" step="1" value="1"></div>
-            <div class="field"><label for="rateBA">Rate / hour (BA)</label><input id="rateBA" type="number" min="0" step="0.01" value="80"></div>
+            <div class="field"><label for="rateBA">Rate / hour (BA)</label><input id="rateBA" type="number" min="0" step="0.01" value="90"></div>
 
             <div class="field"><label for="dev">Developer (count)</label><input id="dev" type="number" min="0" step="1" value="1"></div>
-            <div class="field"><label for="rateDev">Rate / hour (Dev)</label><input id="rateDev" type="number" min="0" step="0.01" value="75"></div>
+            <div class="field"><label for="rateDev">Rate / hour (Dev)</label><input id="rateDev" type="number" min="0" step="0.01" value="85"></div>
 
             <div class="field"><label for="la">Lead Architect (count)</label><input id="la" type="number" min="0" step="1" value="0"></div>
             <div class="field"><label for="rateLA">Rate / hour (LA)</label><input id="rateLA" type="number" min="0" step="0.01" value="120"></div>
@@ -164,18 +164,18 @@
           <h3>Component Percentages (% of Build Hours)</h3>
           <div class="pct-grid">
             <div class="pct-col">
-              <div class="field"><label for="pctDiscovery">1. Discovery &amp; Pre-Development<span class="guideline">Guideline ≤ 15%</span></label><input id="pctDiscovery" type="number" step="0.01" value="12"></div>
-              <div class="field"><label for="pctSoln">2. Solution Design<span class="guideline">Guideline ≤ 15%</span></label><input id="pctSoln" type="number" step="0.01" value="12"></div>
+              <div class="field"><label for="pctDiscovery">1. Discovery &amp; Pre-Development<span class="guideline">Guideline ≤ 15%</span></label><input id="pctDiscovery" type="number" step="0.01" value="10"></div>
+              <div class="field"><label for="pctSoln">2. Solution Design<span class="guideline">Guideline ≤ 15%</span></label><input id="pctSoln" type="number" step="0.01" value="15"></div>
               <div class="field"><label>3. Development<span class="guideline">Custom (Build Hours)</span></label><input disabled value="Custom (Build Hours)"></div>
-              <div class="field"><label for="pctQA">4. Internal QA / Alpha Testing<span class="guideline">Guideline ≤ 15%</span></label><input id="pctQA" type="number" step="0.01" value="10"></div>
-              <div class="field"><label for="pctUAT">5. UAT Support<span class="guideline">Guideline ≤ 15%</span></label><input id="pctUAT" type="number" step="0.01" value="10"></div>
+              <div class="field"><label for="pctQA">4. Internal QA / Testing<span class="guideline">Guideline ≤ 15%</span></label><input id="pctQA" type="number" step="0.01" value="10"></div>
+              <div class="field"><label for="pctUAT">5. UAT<span class="guideline">Guideline ≤ 15%</span></label><input id="pctUAT" type="number" step="0.01" value="10"></div>
             </div>
             <div class="pct-col">
-              <div class="field"><label for="pctGoLive">6. Go‑Live Support &amp; Deployment<span class="guideline">Guideline ≤ 10%</span></label><input id="pctGoLive" type="number" step="0.01" value="6"></div>
+              <div class="field"><label for="pctTrain">6. Training<span class="guideline">Guideline ≤ 5%</span></label><input id="pctTrain" type="number" step="0.01" value="3"></div>
               <div class="field"><label for="pctDocs">7. Documentation<span class="guideline">Guideline ≤ 5%</span></label><input id="pctDocs" type="number" step="0.01" value="3"></div>
-              <div class="field"><label for="pctTrain">8. Training<span class="guideline">Guideline ≤ 5%</span></label><input id="pctTrain" type="number" step="0.01" value="3"></div>
-              <div class="field"><label for="pctRisk">9. Buffer / Contingency<span class="guideline">Guideline ≤ 10%</span></label><input id="pctRisk" type="number" step="0.01" value="8"></div>
-              <div class="field"><label for="pctPM">10. Management &amp; Governance<span class="guideline">Guideline ≤ 5%</span></label><input id="pctPM" type="number" step="0.01" value="5"></div>
+              <div class="field"><label for="pctGoLive">8. Hyper-care<span class="guideline">Guideline ≤ 10%</span></label><input id="pctGoLive" type="number" step="0.01" value="5"></div>
+              <div class="field"><label for="pctPM">9. Management &amp; Governance<span class="guideline">Guideline ≤ 5%</span></label><input id="pctPM" type="number" step="0.01" value="5"></div>
+              <div class="field"><label for="pctRisk">10. Buffer / Contingency<span class="guideline">Guideline ≤ 10%</span></label><input id="pctRisk" type="number" step="0.01" value="5"></div>
             </div>
           </div>
           <div id="pctSum" class="note"></div>
@@ -205,8 +205,8 @@
           <div class="summary-title">Project Snapshot</div>
           <div class="summary-values">
             <div class="summary-item">
-              <div class="label">Total Cost</div>
-              <div class="value"><strong id="summaryCost">—</strong></div>
+              <div class="label">Total Hours</div>
+              <div class="value"><strong id="summaryHours">—</strong></div>
             </div>
             <div class="summary-item">
               <div class="label">Duration (Days)</div>
@@ -217,8 +217,8 @@
               <div class="value"><strong id="summaryWeeks">—</strong></div>
             </div>
             <div class="summary-item">
-              <div class="label">Total Hours</div>
-              <div class="value"><strong id="summaryHours">—</strong></div>
+              <div class="label">Total Cost</div>
+              <div class="value"><strong id="summaryCost">—</strong></div>
             </div>
           </div>
         </div>
@@ -230,7 +230,7 @@
         </div>
 
         <div class="small" style="margin-top:10px">
-          <span class="pill">Cost model: <b>Daily burn from role mix × duration</b> (duration = total hours ÷ business hours/day).</span>
+          <span class="pill">Cost model: <b>Total cost = Total hours × Base per‑hour</b> (daily burn shown = base rate × business hours/day).</span>
         </div>
         <div id="alerts" class="small" style="margin-top:6px"></div>
       </div>
@@ -388,13 +388,13 @@
         { name: "1. Discovery & Pre-Development",   pct: ui.pct.discovery },
         { name: "2. Solution Design",               pct: ui.pct.soln },
         { name: "3. Development",                   pct: "custom" },
-        { name: "4. Internal QA / Alpha Testing",   pct: ui.pct.qa },
-        { name: "5. UAT Support",                   pct: ui.pct.uat },
-        { name: "6. Go-Live Support & Deployment",  pct: ui.pct.go },
+        { name: "4. Internal QA / Testing",         pct: ui.pct.qa },
+        { name: "5. UAT",                           pct: ui.pct.uat },
+        { name: "6. Training",                      pct: ui.pct.train },
         { name: "7. Documentation",                 pct: ui.pct.docs },
-        { name: "8. Training",                      pct: ui.pct.train },
-        { name: "9. Buffer / Contingency",          pct: ui.pct.risk },
-        { name: "10. Management & Governance",      pct: ui.pct.pm },
+        { name: "8. Hyper-care",                    pct: ui.pct.go },
+        { name: "9. Management & Governance",       pct: ui.pct.pm },
+        { name: "10. Buffer / Contingency",         pct: ui.pct.risk },
       ];
 
       const tbody = document.querySelector("#resultTable tbody");
@@ -405,9 +405,7 @@
 
       // Team stats
       const teamSize = ui.roles.reduce((s,r)=>s + r.count, 0);
-      const dailyBurnSelectedCurrency =
-        ui.roles.reduce((s,r)=> s + (r.count * r.rate * safeHoursPerDay), 0);
-      const dailyBurnINR = toINR(dailyBurnSelectedCurrency, ui.currency, ui.inrPerUsd, ui.inrPerSar);
+      const dailyBurnSelectedCurrency = ui.perHour * safeHoursPerDay;
 
       // Fill table
       comps.forEach(c => {
@@ -427,16 +425,8 @@
 
       // Duration & cost (project-level)
       const durationDays = totalHours / safeHoursPerDay;
-      const totalCostINR_fromBurn = dailyBurnINR * durationDays;
-      totalCostINR = totalCostINR_fromBurn;
-
-      // If user is using a blended single rate (perHour) and no role rates entered (counts sum to 0),
-      // fallback to legacy model totalHours × rate
-      if(teamSize === 0){
-        // interpret perHour as selected currency rate
-        const totalCostSelected = totalHours * ui.perHour;
-        totalCostINR = toINR(totalCostSelected, ui.currency, ui.inrPerUsd, ui.inrPerSar);
-      }
+      const totalCostSelectedCurrency = totalHours * ui.perHour;
+      totalCostINR = toINR(totalCostSelectedCurrency, ui.currency, ui.inrPerUsd, ui.inrPerSar);
 
       // Allocate costs to rows proportionally by hours
       const trs = Array.from(tbody.querySelectorAll("tr"));
@@ -457,17 +447,17 @@
       tHours.textContent = fmt(totalHours);
       tDays.textContent  = fmt(durationDays);
       tWeeks.textContent = fmt(totalWeeks);
-      const totalCostSelectedCurrency = fromINR(totalCostINR, ui.currency, ui.inrPerUsd, ui.inrPerSar);
-      tCost.textContent  = money(totalCostSelectedCurrency, ui.currency);
+      const totalCostDisplayCurrency = fromINR(totalCostINR, ui.currency, ui.inrPerUsd, ui.inrPerSar);
+      tCost.textContent  = money(totalCostDisplayCurrency, ui.currency);
 
-      document.getElementById("summaryCost").textContent  = money(totalCostSelectedCurrency, ui.currency);
+      document.getElementById("summaryCost").textContent  = money(totalCostDisplayCurrency, ui.currency);
       document.getElementById("summaryDays").textContent  = fmt(durationDays);
       document.getElementById("summaryWeeks").textContent = fmt(totalWeeks);
       document.getElementById("summaryHours").textContent = fmt(totalHours);
 
       // KPIs
       document.getElementById("teamSize").textContent = teamSize;
-      document.getElementById("burnDay").textContent = teamSize > 0 ? money(dailyBurnSelectedCurrency, ui.currency) : "—";
+      document.getElementById("burnDay").textContent = money(dailyBurnSelectedCurrency, ui.currency);
       document.getElementById("avgDur").textContent = fmt(durationDays);
 
       // Percentage sum info
@@ -480,7 +470,6 @@
       // Alerts
       const alerts = document.getElementById("alerts");
       let notes = [];
-      if(teamSize === 0) notes.push("Team size is 0 — using blended rate model (Total Hours × Base per‑hour).");
       if(pctSum <= 0) notes.push("All percentages are 0; only Development will be counted.");
       alerts.innerHTML = notes.join(" ");
     }
@@ -607,6 +596,7 @@
     }
 
     function wire(){
+      const roleFields = new Set(["sa","dm","ba","dev","la","rateSA","rateDM","rateBA","rateDev","rateLA"]);
       const ids = ["perHour","inrPerUsd","inrPerSar","buildHours","hoursPerDay",
                    "pctDiscovery","pctSoln","pctQA","pctUAT","pctGoLive","pctDocs","pctTrain","pctRisk","pctPM",
                    "sa","dm","ba","dev","la","rateSA","rateDM","rateBA","rateDev","rateLA"];
@@ -615,6 +605,11 @@
         if(id === "perHour"){
           el.addEventListener("input", ()=>{
             perHourEdited = true;
+            calculate();
+          });
+        }else if(roleFields.has(id)){
+          el.addEventListener("input", ()=>{
+            perHourEdited = false;
             calculate();
           });
         }else{
@@ -638,14 +633,14 @@
         document.getElementById("inrPerSar").value = 22.00;
         document.getElementById("buildHours").value = 500;
         document.getElementById("hoursPerDay").value = 6;
-        document.getElementById("pctDiscovery").value = 12;
-        document.getElementById("pctSoln").value = 12;
+        document.getElementById("pctDiscovery").value = 10;
+        document.getElementById("pctSoln").value = 15;
         document.getElementById("pctQA").value = 10;
         document.getElementById("pctUAT").value = 10;
-        document.getElementById("pctGoLive").value = 6;
+        document.getElementById("pctGoLive").value = 5;
         document.getElementById("pctDocs").value = 3;
         document.getElementById("pctTrain").value = 3;
-        document.getElementById("pctRisk").value = 8;
+        document.getElementById("pctRisk").value = 5;
         document.getElementById("pctPM").value = 5;
         document.getElementById("sa").value = 1;
         document.getElementById("dm").value = 1;
@@ -654,8 +649,8 @@
         document.getElementById("la").value = 0;
         document.getElementById("rateSA").value = 100;
         document.getElementById("rateDM").value = 125;
-        document.getElementById("rateBA").value = 80;
-        document.getElementById("rateDev").value = 75;
+        document.getElementById("rateBA").value = 90;
+        document.getElementById("rateDev").value = 85;
         document.getElementById("rateLA").value = 120;
         calculate();
       });
